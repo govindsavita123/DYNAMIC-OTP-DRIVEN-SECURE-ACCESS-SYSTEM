@@ -117,7 +117,7 @@ void eint0_isr(void) __irq
 				delay_ms(10);
 				StrLCD("1.ENTER PASSWORD");
 				CmdLCD(0xc1);
-				//StrLCD("1");
+				
         //clear eint0 status (through EXTINT SFR)
         EXTINT = 1<<3;
         //clear eint0 status in VIC (through VICVectAddr )
@@ -231,7 +231,7 @@ while(1){
              CmdLCD(0x01);
              delay_ms(20);
              U32LCD(Key1);
-         delay_ms(700);
+             delay_ms(700);
              if(Key1==Key2)
              {
                  CmdLCD(0x01);
