@@ -20,7 +20,6 @@
 #define EN1 21
 #define PIN1 22
 #define PIN2 23
-//#define Buzzer 24
 #define Time 2
 
 #define EINT3_PIN      20 //select the one port pin which will give support for EINT3
@@ -102,11 +101,10 @@ void eint0_isr(void) __irq
 					StrLCD("wrong pass");
 					delay_ms(200);
 					}
-					//i2c_eeprom_page_write(0x50,0x0000,pwd,4);
-					//i2c_eeprom_seq_read(0x50,0x0000,r_pwd,4);
+					i2c_eeprom_page_write(0x50,0x0000,pwd,4);
+					i2c_eeprom_seq_read(0x50,0x0000,r_pwd,4);
 
-					//Key3=atoi((const char *)r_pwd);
-          Key3=atoi((const char *)pwd);
+					Key3=atoi((const char *)r_pwd);
         }
         else
         {
@@ -115,7 +113,7 @@ void eint0_isr(void) __irq
 					delay_ms(200);
         }
 				delay_ms(10);
-        CmdLCD(0x01);
+                                CmdLCD(0x01);
 				delay_ms(10);
 				StrLCD("1.ENTER PASSWORD");
 				CmdLCD(0xc1);
@@ -154,25 +152,23 @@ int main()
         InitLCD();
         Keypad_Init();
         Enable_EINT0();
-        //init_i2c();
+        init_i2c();
          RTC_Init();
-	      //UART0_Init();
+	UART0_Init();
        RTCSetTime(1,15,5);
 
               IODIR0|=1<<EN1;
               IODIR0|=1<<PIN1;
               IODIR0|=1<<PIN2;
-              //IODIR0|=1<<Buzzer;
 
         IODIR0|=1<<EINT3_LED;
 
         IOSET0|=1<<EN1;
 
-           //    i2c_eeprom_page_write(0x50,0x0000,pwd,4);
-         //i2c_eeprom_seq_read(0x50,0x0000,r_pwd,4);
+           i2c_eeprom_page_write(0x50,0x0000,pwd,4);
+         i2c_eeprom_seq_read(0x50,0x0000,r_pwd,4);
 
-              //Key3=atoi((const char *)r_pwd);
-              Key3=atoi((const char *)pwd);
+              Key3=atoi((const char *)r_pwd);
 
 while(1){
 
@@ -206,66 +202,54 @@ while(1){
 
 
 
-             /*RTCGetTime(&Hr,&Mn,&Sec);
-					   otp(Hr);
-             otp(Mn);
-             otp(Sec);*/
-            otp(HOUR);
+             RTCGetTime(&Hr,&Mn,&Sec);
+             otp(HOUR);
              otp(MIN);
              otp(SEC);
 
-                                       // i=0;
-            // GSM_Send_SMS("9516253166",str);
-                                           delay_ms(100);
+             GSM_Send_SMS("9516253166",str);
+                delay_ms(100);
              ip1:
 
-                                          CmdLCD(0x01);
+                CmdLCD(0x01);
                   Key2=atoi(str);
                   StrLCD("OTP: ");
                   SetCursor(1,12);
-                //  CharLCD(':');
-                                                                        //CharLCD(' ');
-                                                                        U32LCD(Key2);
-                //  U32LCD(Time);
-                                                 RTCGetTime(&Hr,&Mn,&Sec);
-                                                 start_sec=Sec;
-                                                 start_min=Mn;
-                                                 Key1=readNum();
-                                                 RTCGetTime(&Hr,&Mn,&Sec);
-                                                 //if(((Mn-start_min)*60 +(Sec-start_sec))>Time){
-																									  if(((Sec-start_sec))>Time){
-																													CmdLCD(0xc0);
-                                                         StrLCD("Time Lapsed....");
-                                                         delay_ms(700);
-                                                         goto ip;
+                   U32LCD(Key2);
+                RTCGetTime(&Hr,&Mn,&Sec);
+                 start_sec=Sec;
+                 start_min=Mn;
+                   Key1=readNum();
+                 RTCGetTime(&Hr,&Mn,&Sec);
+		if(((Sec-start_sec))>Time){
+			CmdLCD(0xc0);
+               StrLCD("Time Lapsed....");
+                     delay_ms(700);
+                     goto ip;
 																			
                                                  }
              CmdLCD(0x01);
              delay_ms(20);
              U32LCD(Key1);
-                                                 delay_ms(700);
+         delay_ms(700);
              if(Key1==Key2)
              {
                  CmdLCD(0x01);
                  CmdLCD(0x80);
                  StrLCD("Log IN ACCESSED");
 
-                                                           IOSET0|=1<<PIN2;
-                                                           IOCLR0|=1<<PIN1;
-                                                           delay_ms(1000);
+                 IOSET0|=1<<PIN2;
+                 IOCLR0|=1<<PIN1;
+                 delay_ms(1000);
 
-                                                           IOSET0|=1<<PIN1;
-                                                           IOSET0|=1<<PIN2;
-                                                //         delay_ms(4000);
+                 IOSET0|=1<<PIN1;
+                 IOSET0|=1<<PIN2;
              }
              else
              {
                  CmdLCD(0x01);
                  CmdLCD(0x80);
                  StrLCD("Denied");
-                        //                                 IOSET0|=1<<Buzzer;
-                        //                                 delay_ms(1000);
-                        //                                 IOCLR0|=1<<Buzzer;
                  goto ip1;
              }
         }
